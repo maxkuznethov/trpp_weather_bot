@@ -19,9 +19,14 @@ public class Weather {
             Map<String,Object> temperatureMap = (Map<String, Object>) dayMap.get("temp");
             ArrayList<Map<String, Object>> states = (ArrayList<Map<String, Object>>) dayMap.get("weather");
             Map<String, Object> stateMap = states.get(0);
-            return "Погода: " + stateMap.get("description") + "\nТемпература: " + temperatureMap.get("day") + "°C" +
-                    "\nСкорость ветра: " + dayMap.get("wind_speed") +" м/с";
-        } catch (IOException e) {
+            return "Погода: " + stateMap.get("description") +
+                    "\nТемпература ночью: " + temperatureMap.get("night") + "°C"+
+                    "\nТемпература утром: " + temperatureMap.get("morn") + "°C"+
+                    "\nТемпература днем: " + temperatureMap.get("day") + "°C" +
+                    "\nТемпература вечером: " + temperatureMap.get("eve") + "°C"+
+                    "\nСкорость ветра: " + dayMap.get("wind_speed") +" м/с"+
+                    "\nВлажность: " +dayMap.get("humidity")+"%";
+        } catch (Exception e) {
             return "Город введен неверно";
         }
     }
@@ -32,15 +37,18 @@ public class Weather {
             Map<String, Object> currentMap = (Map<String, Object>) weatherMap.get("current");
             ArrayList<Map<String, Object>> states = (ArrayList<Map<String, Object>>) currentMap.get("weather");
             Map<String, Object> stateMap = states.get(0);
-            return "Погода: " + stateMap.get("description") + "\nТемпература: " + currentMap.get("temp") + "°C" +
-                    "\nЧувствуется как: " + currentMap.get("feels_like") + "°C" + "\nСкорость ветра: " + currentMap.get("wind_speed") +" м/с";
-        } catch (IOException e) {
+            return "Погода: " + stateMap.get("description") +
+                    "\nТемпература: " + currentMap.get("temp") + "°C" +
+                    "\nЧувствуется как: " + currentMap.get("feels_like") + "°C" +
+                    "\nСкорость ветра: " + currentMap.get("wind_speed") +" м/с" +
+                    "\nВлажность: " +currentMap.get("humidity")+"%";
+        } catch (Exception e) {
             return "Город введен неверно";
         }
     }
 
 
-    public static Map<String, Object> getWeatherMap(String cityName) throws IOException {
+    public static Map<String, Object> getWeatherMap(String cityName) throws Exception {
         String[] coordinates = getCoordinatesByCityName(cityName);
         String weatherRequest = String.format("https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&" +
                         "exclude=hourly,alerts,minutely&appid=%s&units=metric&lang=ru",
@@ -49,7 +57,7 @@ public class Weather {
         return JsonConverter.jsonToMap(weatherData);
     }
 
-    private static String[] getCoordinatesByCityName(String cityName) throws IOException {
+    private static String[] getCoordinatesByCityName(String cityName) throws Exception {
         String[] coordinates = new String[2];
         String geocodingRequest = String.format("http://api.openweathermap.org/geo/1.0/direct?q=%s&limit=1&appid=%s",
                 cityName, API_KEY);
