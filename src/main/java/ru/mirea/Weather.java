@@ -11,10 +11,25 @@ import java.util.Map;
 public class Weather {
     private static final String API_KEY = "dd2d55e8ce4881fef137b3ac75081732";
 
+    public static String getDayWeather(String cityName, int dayIndex){
+        try {
+            Map<String, Object> weatherMap = getWeatherMap(cityName);
+            ArrayList<Map<String,Object>> days = (ArrayList<Map<String, Object>>) weatherMap.get("daily");
+            Map<String, Object> dayMap = days.get(dayIndex);
+            Map<String,Object> temperatureMap = (Map<String, Object>) dayMap.get("temp");
+            ArrayList<Map<String, Object>> states = (ArrayList<Map<String, Object>>) dayMap.get("weather");
+            Map<String, Object> stateMap = states.get(0);
+            return "Погода: " + stateMap.get("description") + "\nТемпература: " + temperatureMap.get("day") + "°C" +
+                    "\nСкорость ветра: " + dayMap.get("wind_speed") +" м/с";
+        } catch (IOException e) {
+            return "Город введен неверно";
+        }
+    }
+
     public static String getCurrentWeather(String cityName) {
         try {
             Map<String, Object> weatherMap = getWeatherMap(cityName);
-            Map<String, Object> currentMap = JsonConverter.jsonToMap(weatherMap.get("current").toString());
+            Map<String, Object> currentMap = (Map<String, Object>) weatherMap.get("current");
             ArrayList<Map<String, Object>> states = (ArrayList<Map<String, Object>>) currentMap.get("weather");
             Map<String, Object> stateMap = states.get(0);
             return "Погода: " + stateMap.get("description") + "\nТемпература: " + currentMap.get("temp") + "°C" +
@@ -25,7 +40,7 @@ public class Weather {
     }
 
 
-    private static Map<String, Object> getWeatherMap(String cityName) throws IOException {
+    public static Map<String, Object> getWeatherMap(String cityName) throws IOException {
         String[] coordinates = getCoordinatesByCityName(cityName);
         String weatherRequest = String.format("https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&" +
                         "exclude=hourly,alerts,minutely&appid=%s&units=metric&lang=ru",
